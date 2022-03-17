@@ -1,0 +1,94 @@
+var express = require("express")
+var app = express()
+require("dotenv").config()
+var cors = require("cors")
+var dal = require("./dal.js")
+const e = require("express")
+const authorize = require("./authorization-middleware")
+const jwt = require("jsonwebtoken")
+const { JWT_SECRET } = require("./config")
+const config = require("./config")
+
+// used to serve static files from public directory
+app.use(express.static("public"))
+app.use(cors())
+
+// create user account
+app.get("/account/create/:name/:email/:password", function (req, res) {
+  // check if account exists
+  dal.find(req.params.email).then((users) => {
+    // if user exists, return error message
+    if (users.length > 0) {
+      console.log("User already in exists")
+      res.send("User already in exists")
+    } else {
+      // else create user
+      dal
+        .create(req.params.name, req.params.email, req.params.password)
+        .then((user) => {
+          console.log(user)
+          res.send(user)
+        })
+    }
+  })
+})
+
+// login user
+app.get("/account/login/:email/:password", function (req, res, next) {
+  dal.find(req.params.email).then((user) => {
+    // if user exists, check password
+    if (user.length > 0) {
+      if (user[0].password === req.params.password) {
+        const payload = user[0]
+        const token = jwt.sign(payload, "My super secret key")
+        const currUser = { ...user[0], token }
+        // res.send(token);
+        res.send(currUser)
+      } else {
+        res.send("Login failed: wrong password")
+      }
+    } else {
+      res.send("Login failed: user not found")
+    }
+  })
+})
+
+// find user account
+app.get("/account/find/:email", function (req, res) {
+  dal.find(req.params.email).then((user) => {
+    console.log(user)
+    res.send(user)
+  })
+})
+
+// find one user by email - alternative to find
+app.get("/account/findOne/:email", function (req, res) {
+  dal.findOne(req.params.email).then((user) => {
+    console.log(user)
+    res.send(user)
+  })
+})
+
+// update - deposit/withdraw amount
+app.get("/account/update/:email/:amount", function (req, res) {
+  var amount = Number(req.params.amount)
+
+  dal.update(req.params.email, amount).then((response) => {
+    if (amount < 0) {
+      console.log(`Withdrew ${amount * -1} bucks from your account!`)
+    } else console.log(`You deposited ${amount} dollars in your account!`)
+    res.send(response)
+  })
+})
+
+// all accounts
+app.get("/account/all", authorize("customer:read"), function (req, res) {
+  dal.all().then((docs) => {
+    console.log(docs)
+    res.send(docs)
+  })
+})
+
+var PORT = process.env.PORT || 3000
+app.listen(PORT)
+console.log("Running on port: " + PORT)
