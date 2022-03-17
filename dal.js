@@ -7,6 +7,7 @@ MongoClient.connect(uri, { useUnifiedTopology: true }, function (err, client) {
   console.log("Connected successfully to db server")
   
   //new line to check for error
+  console.log(process.env.MONGODB_STRING) 
   if (err) console.log(err);
 
   // connect to myproject database
