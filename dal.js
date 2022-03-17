@@ -1,6 +1,5 @@
 const MongoClient = require("mongodb").MongoClient
-const uri =
-  "mongodb+srv://drew:drew@strudz.odpuc.mongodb.net/bank_customers?retryWrites=true&w=majority"
+const uri = process.env.MONGO_STRING
 let db = null
 
 // connect to mongo
