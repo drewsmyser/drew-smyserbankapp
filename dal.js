@@ -1,33 +1,17 @@
-// const config = require("./config")
 const MongoClient = require("mongodb").MongoClient
-// // const url = "mongodb://localhost:27017"
-const uri = process.env.MONGODB_URI
+const uri =
+  "mongodb+srv://drew:drew@strudz.odpuc.mongodb.net/bank_customers?retryWrites=true&w=majority"
+let db = null
 
 // connect to mongo
 MongoClient.connect(uri, { useUnifiedTopology: true }, function (err, client) {
   console.log("Connected successfully to db server")
 
   // connect to myproject database
-
   db = client.db("bank_customers")
 
-  console.log(uri)
-  db.close()
+  // console.log(uri)
 })
-
-// var MongoClient = require("mongodb").MongoClient
-
-// MongoClient.connect(uri, { useUnifiedTopology: true }, function (err, db) {
-//   if (err) throw err
-
-//   var dbase = db.db("bank_customers")
-
-//   db.db("users", function (err, res) {
-//     if (err) throw err
-//     console.log("Collection created!")
-//     db.close()
-//   })
-// })
 
 // create user account
 function create(name, email, password) {
@@ -92,3 +76,4 @@ function all() {
 }
 
 module.exports = { create, findOne, find, update, all }
+
