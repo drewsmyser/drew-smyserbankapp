@@ -12,6 +12,7 @@ MongoClient.connect(uri, { useUnifiedTopology: true }, function (err, client) {
   db = client.db("bank_customers")
 
   console.log(uri)
+  db.close()
 })
 
 // var MongoClient = require("mongodb").MongoClient
